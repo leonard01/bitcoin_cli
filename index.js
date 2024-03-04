@@ -3,6 +3,17 @@
 const yargs = require("yargs/yargs");
 const { hideBin } = require("yargs/helpers");
 const axios = require("axios");
+const {
+  fetchBalance,
+  fetchTransactions,
+  fetchUTXOs,
+  fetchPrice,
+} = require("./helper");
+/*
+  to do
+    fetch-transactions sat value returning undefined
+    possibly move some functionality to helper function file
+*/
 
 yargs(hideBin(process.argv))
   .command(
@@ -16,20 +27,20 @@ yargs(hideBin(process.argv))
   .command(
     "btc-price", // the command name
     "fetch the current price of Bitcoin from the Coinbase API", // description
-    () => {}, // command builder function to specify command-specific options
-    async () => {
-      // make the function async to use await for the HTTP request
-      try {
-        const response = await axios.get(
-          "https://api.coinbase.com/v2/prices/spot?currency=USD"
-        );
-        console.log(
-          `The current price of Bitcoin is $${response.data.data.amount} USD`
-        );
-      } catch (error) {
-        console.error("Error fetching the Bitcoin price:", error.message);
-      }
-    }
+    fetchPrice
+    // async () => {
+    //   // make the function async to use await for the HTTP request
+    //   try {
+    //     const response = await axios.get(
+    //       "https://api.coinbase.com/v2/prices/spot?currency=USD"
+    //     );
+    //     console.log(
+    //       `The current price of Bitcoin is $${response.data.data.amount} USD`
+    //     );
+    //   } catch (error) {
+    //     console.error("Error fetching the Bitcoin price:", error.message);
+    //   }
+    // }
   )
   .command(
     "eth-price",
@@ -47,30 +58,7 @@ yargs(hideBin(process.argv))
         type: "string",
       });
     },
-    async (argv) => {
-      const url = `https://mempool.space/api/address/${argv.address}/utxo`;
-      try {
-        const response = await axios.get(url);
-        const utxos = response.data;
-        if (utxos.length > 0) {
-          console.log(`UTXOs for address ${argv.address}:`);
-          utxos.forEach((utxo, index) => {
-            console.log(
-              `${index + 1}: Txid: ${utxo.txid}, Output Index: ${
-                utxo.vout
-              }, Amount: ${utxo.value} satoshis`
-            );
-          });
-        } else {
-          console.log(`No UTXOs found for address ${argv.address}.`);
-        }
-      } catch (error) {
-        console.error(
-          `Error fetching UTXOs for address ${argv.address}:`,
-          error.message
-        );
-      }
-    }
+    fetchUTXOs
   )
   .command(
     "fetch-balance <address>",
@@ -81,21 +69,18 @@ yargs(hideBin(process.argv))
         type: "string",
       });
     },
-    async (argv) => {
-      const url = `https://mempool.space/api/address/${argv.address}`;
-      try {
-        const response = await axios.get(url);
-        const balance =
-          response.data.chain_stats.funded_txo_sum -
-          response.data.chain_stats.spent_txo_sum;
-        console.log(`Balance for address ${argv.address}: ${balance} satoshis`);
-      } catch (error) {
-        console.error(
-          `Error fetching balance for address ${argv.address}:`,
-          error.message
-        );
-      }
-    }
+    fetchBalance
+  )
+  .command(
+    "fetch-transactions <address>",
+    "fetch all transactions for a specific Bitcoin address using Mempool.space API",
+    (yargs) => {
+      yargs.positional("address", {
+        describe: "Bitcoin address to fetch transactions for",
+        type: "string",
+      });
+    },
+    fetchTransactions
   )
   .demandCommand(1, "You need at least one command before moving on")
   .help() // Enable the automatic help information
