@@ -25,8 +25,8 @@ yargs(hideBin(process.argv))
     } // the function to execute when the command is invoked
   )
   .command(
-    "btc-price", // the command name
-    "fetch the current price of Bitcoin from the Coinbase API", // description
+    "btc-price",
+    "fetch the current price of Bitcoin from the Coinbase API",
     fetchPrice
   )
   .command(

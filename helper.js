@@ -1,7 +1,13 @@
 const axios = require("axios");
 
+const TESTNET = "https://mempool.space/testnet/";
+const MAINNET = "https://mempool.space/api/";
+var isMainnet = false; // Toggle this to switch between MAINNET and TESTNET
+
 async function fetchBalance(argv) {
-  const url = `https://mempool.space/api/address/${argv.address}`;
+  const baseUrl = isMainnet ? MAINNET : TESTNET;
+  const url = `${baseUrl}address/${argv.address}`;
+
   try {
     const response = await axios.get(url);
     const balance =
@@ -13,6 +19,7 @@ async function fetchBalance(argv) {
       `Error fetching balance for address ${argv.address}:`,
       error.message
     );
+    console.log(url);
   }
 }
 
