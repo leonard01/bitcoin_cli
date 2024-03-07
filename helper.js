@@ -48,23 +48,17 @@ async function fetchTransactions(argv) {
 }
 
 async function fetchPrice() {
-  console.log("got here"),
-    () => {},
-    async () => {
-      // make the function async to use await for the HTTP request
-
-      try {
-        console.log("got here");
-        const response = await axios.get(
-          "https://api.coinbase.com/v2/prices/spot?currency=USD"
-        );
-        console.log(
-          `The current price of Bitcoin is $${response.data.data.amount} USD`
-        );
-      } catch (error) {
-        console.error("Error fetching the Bitcoin price:", error.message);
-      }
-    };
+  () => {};
+  try {
+    const response = await axios.get(
+      "https://api.coinbase.com/v2/prices/spot?currency=USD"
+    );
+    console.log(
+      `The current price of Bitcoin is $${response.data.data.amount} USD`
+    );
+  } catch (error) {
+    console.error("Error fetching the Bitcoin price:", error.message);
+  }
 }
 
 // fetch all UTXOs for an address
